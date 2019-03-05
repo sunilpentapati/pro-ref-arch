@@ -1,0 +1,30 @@
+apiVersion: getambassador.io/v1beta2
+kind: Filter
+metadata:
+  name: keycloak
+  namespace: default
+spec:
+  OAuth2:
+    authorizationURL: http://keycloak-headless.default.svc.cluster.local
+    clientURL: https://ambassador.default.svc.cluster.local
+    audience: "audience"
+    clientID: "richard-test"
+    secret: "899729a1-5df3-47b1-a200-934870cf3a06"
+---
+apiVersion: getambassador.io/v1beta2
+kind: FilterPolicy
+metadata:
+  name: httpbin-policy
+  namespace: default
+spec:
+  # everything defaults to private; you can create rules to make stuff
+  # public, and you can create rules to require additional scopes
+  # which will be automatically checked
+  rules:
+    - host: "*"
+      path: /httpbin/ip
+      filters: null # make this path public
+    - host: "*"
+      path: /keycloak/httpbin/headers
+      filters:
+        - name: keycloak
